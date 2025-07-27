@@ -10,6 +10,26 @@ body {
 
 /* Navbar */
 .navbar {
+  @media (max-width: 900px) {
+  .navbar {
+    flex-direction: column;
+    align-items: center;         /* Center logo and links */
+    padding: 1rem 0;             /* Reduce horizontal padding */
+  }
+  .nav-links {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: auto;                 /* Remove full width */
+    align-items: center;         /* Center the nav items */
+    margin-top: 0.5rem;
+  }
+  .nav-links a {
+    width: 100%;                 /* Make touch targets big for mobile */
+    text-align: center;
+    padding: 0.7rem 1.2rem;
+  }
+}
+
   display: flex;
   justify-content: space-between;
   align-items: center;
