@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listings - BuyanyBike</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo" style="text-decoration:none;">BuyanyBike</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="listings.html">Listings</a></li>
+      <li><a href="buyer-inquiry.html">Buyer Inquiry</a></li>
+      <li><a href="dealer-info.html">Dealer Info</a></li>
+      <li><a href="dealer-login.html">Dealer Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- Listings Section -->
+  <main>
+    <section>
+      <h2 style="text-align:center; margin-top:2rem;">Available Bikes & Scooters</h2>
+      <div class="vehicle-selection">
+        <button class="vehicle-btn" id="bikeBtn">Bike</button>
+        <button class="vehicle-btn" id="scootyBtn">Scooty</button>
+      </div>
+      <div class="card-listings" id="listings-container">
+        <!-- Vehicle cards will be injected here by JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2024 BuyanyBike. All rights reserved.</p>
+  </footer>
+
+  <!-- Floating Enquiry Button and Popup -->
+  <button id="enquiry-fab" style="position:fixed;bottom:32px;right:32px;z-index:1000;background:#007bff;color:#fff;border:none;border-radius:50%;width:60px;height:60px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;">✉️</button>
+  <div id="enquiry-popup" style="display:none;position:fixed;bottom:92px;right:32px;z-index:1001;background:#fff;padding:2rem 1.5rem;border-radius:1rem;box-shadow:0 4px 24px rgba(0,0,0,0.18);width:340px;max-width:95vw;min-width:260px;box-sizing:border-box;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <h3 style="margin:0;font-size:1.2rem;">Send Enquiry</h3>
+      <button id="close-enquiry-popup" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
+    </div>
+    <form id="enquiryFormPopup" action="https://formspree.io/f/meokbvld" method="POST" style="display:flex;flex-direction:column;gap:0.7rem;">
+      <label for="vehicle-popup" style="font-size:0.95rem;">Vehicle of Interest</label>
+      <input type="text" id="vehicle-popup" name="vehicle" placeholder="e.g. Honda Activa 5G" required style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;">
+      <label for="name-popup" style="font-size:0.95rem;">Name</label>
+      <input type="text" id="name-popup" name="name" required style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;">
+      <label for="email-popup" style="font-size:0.95rem;">Email</label>
+      <input type="email" id="email-popup" name="email" required style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;">
+      <label for="phone-popup" style="font-size:0.95rem;">Phone</label>
+      <input type="text" id="phone-popup" name="phone" required style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;">
+      <label for="message-popup" style="font-size:0.95rem;">Message</label>
+      <textarea id="message-popup" name="message" rows="2" style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;"></textarea>
+      <button type="submit" class="btn btn-primary" style="margin-top:0.7rem;">Send</button>
+      <div id="enquirySuccessPopup" style="display:none;color:green;text-align:center;margin-top:10px;">Thank you! Your enquiry has been sent.</div>
+    </form>
+  </div>
+  <script>
+    const fab = document.getElementById('enquiry-fab');
+    const popup = document.getElementById('enquiry-popup');
+    const closePopup = document.getElementById('close-enquiry-popup');
+    const enquiryFormPopup = document.getElementById('enquiryFormPopup');
+    const enquirySuccessPopup = document.getElementById('enquirySuccessPopup');
+    fab.onclick = () => { popup.style.display = 'block'; };
+    closePopup.onclick = () => { popup.style.display = 'none'; };
+    window.onclick = (e) => { if (e.target === popup) popup.style.display = 'none'; };
+    enquiryFormPopup.onsubmit = function(e) {
+      e.preventDefault();
+      fetch(enquiryFormPopup.action, {
+        method: 'POST',
+        body: new FormData(enquiryFormPopup),
+        headers: { 'Accept': 'application/json' }
+      }).then(response => {
+        if (response.ok) {
+          enquirySuccessPopup.style.display = 'block';
+          enquiryFormPopup.reset();
+          setTimeout(() => { popup.style.display = 'none'; enquirySuccessPopup.style.display = 'none'; }, 1500);
+        } else {
+          enquirySuccessPopup.style.display = 'block';
+          enquirySuccessPopup.style.color = 'red';
+          enquirySuccessPopup.textContent = 'There was an error sending your enquiry.';
+        }
+      });
+    }
+  </script>
+  <!-- Listings Script: Edit the bikes array below to update listings -->
+  <script>
+    // =============================
+    // Edit this array to add/remove bikes
+    // =============================
+    let bikes = [];
+
+    // Merge admin-added listings from localStorage
+    const adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+    bikes = bikes.concat(adminListings);
+
+    const container = document.getElementById('listings-container');
+    function renderListings(type) {
+      container.innerHTML = '';
+      const filtered = bikes.filter(bike => bike.type === type);
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style='text-align:center;color:#888;margin:2.5rem 0;'>No listings found.</div>`;
+        return;
+      }
+      filtered.forEach(bike => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cursor = 'pointer';
+        card.onclick = function(e) {
+          localStorage.setItem('selectedVehicle', JSON.stringify(bike));
+          window.location.href = 'vehicle-details.html';
+        };
+        card.style.pointerEvents = 'auto';
+        card.innerHTML = `
+          ${bike.mainImage ? `<img src="${bike.mainImage}" alt="${bike.name}" style="width:100%;height:180px;object-fit:cover;border-radius:8px 8px 0 0;pointer-events:none;" tabindex="-1">` : ''}
+          <h3>${bike.name}</h3>
+          <div class="price">${bike.price}</div>
+          <div class="details">${bike.km} used</div>
+          <div class="dealer">Dealer: ${bike.dealer}</div>
+          <div class="inquire-btn" style="display:none;"></div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Initial render (show all bikes by default)
+    renderListings('bike');
+  </script>
+  <script>
+    const bikeBtn = document.getElementById('bikeBtn');
+    const scootyBtn = document.getElementById('scootyBtn');
+
+    bikeBtn.addEventListener('click', () => {
+      bikeBtn.classList.add('active');
+      scootyBtn.classList.remove('active');
+      renderListings('bike');
+    });
+
+    scootyBtn.addEventListener('click', () => {
+      scootyBtn.classList.add('active');
+      bikeBtn.classList.remove('active');
+      renderListings('scooty');
+    });
+  </script>
+</body>
+</html>

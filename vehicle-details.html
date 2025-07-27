@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Details - BuyanyBike</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="logo" style="text-decoration:none;">BuyanyBike</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="listings.html">Listings</a></li>
+      <li><a href="buyer-inquiry.html">Buyer Inquiry</a></li>
+      <li><a href="dealer-info.html">Dealer Info</a></li>
+      <li><a href="dealer-login.html">Dealer Login</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section style="max-width:600px;margin:2rem auto;">
+      <a href="listings.html" style="color:#007bff;text-decoration:none;font-weight:600;">&larr; Back to Listings</a>
+      <div id="vehicle-carousel" style="margin:1.5rem 0 1rem 0;"></div>
+      <div id="vehicle-details" style="background:#fff;padding:2rem 1.5rem;border-radius:1rem;box-shadow:0 2px 16px rgba(0,0,0,0.10);margin-top:1.5rem;">
+        <!-- Vehicle details will be injected here -->
+      </div>
+      <button id="enquire-details-btn" class="btn btn-primary" style="margin-top:2rem;">Enquire Now</button>
+    </section>
+  </main>
+  <footer class="footer">
+    <p>&copy; 2024 BuyanyBike. All rights reserved.</p>
+  </footer>
+  <!-- Floating Enquiry Button and Popup -->
+  <button id="enquiry-fab" style="position:fixed;bottom:32px;right:32px;z-index:1000;background:#007bff;color:#fff;border:none;border-radius:50%;width:60px;height:60px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;">✉️</button>
+  <div id="enquiry-popup" style="display:none;position:fixed;bottom:92px;right:32px;z-index:1001;background:#fff;padding:2rem 1.5rem;border-radius:1rem;box-shadow:0 4px 24px rgba(0,0,0,0.18);width:340px;max-width:95vw;min-width:260px;box-sizing:border-box;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <h3 style="margin:0;font-size:1.2rem;">Send Enquiry</h3>
+      <button id="close-enquiry-popup" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
+    </div>
+    <form id="enquiryFormPopup" action="https://formspree.io/f/meokbvld" method="POST" style="display:flex;flex-direction:column;gap:0.7rem;">
+      <label for="vehicle-popup" style="font-size:0.95rem;">Vehicle of Interest</label>
+      <input type="text" id="vehicle-popup" name="vehicle" placeholder="e.g. Honda Activa 5G" required style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;">
+      <label for="name-popup" style="font-size:0.95rem;">Name</label>
+      <input type="text" id="name-popup" name="name" required style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;">
+      <label for="email-popup" style="font-size:0.95rem;">Email</label>
+      <input type="email" id="email-popup" name="email" required style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;">
+      <label for="phone-popup" style="font-size:0.95rem;">Phone</label>
+      <input type="text" id="phone-popup" name="phone" required style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;">
+      <label for="message-popup" style="font-size:0.95rem;">Message</label>
+      <textarea id="message-popup" name="message" rows="2" style="padding:0.6rem;border-radius:6px;border:1px solid #ccc;"></textarea>
+      <button type="submit" class="btn btn-primary" style="margin-top:0.7rem;">Send</button>
+      <div id="enquirySuccessPopup" style="display:none;color:green;text-align:center;margin-top:10px;">Thank you! Your enquiry has been sent.</div>
+    </form>
+  </div>
+  <script>
+    // Get vehicle data from localStorage and display
+    const details = JSON.parse(localStorage.getItem('selectedVehicle'));
+    const detailsDiv = document.getElementById('vehicle-details');
+    const carouselDiv = document.getElementById('vehicle-carousel');
+    if (details) {
+      // Carousel for detail images
+      if (details.detailImages && details.detailImages.length > 0) {
+        let current = 0;
+        function renderCarousel() {
+          carouselDiv.innerHTML = `
+            <div style='position:relative;width:100%;height:260px;background:#f7f7f7;border-radius:1rem;overflow:hidden;display:flex;align-items:center;justify-content:center;'>
+              <img src="${details.detailImages[current]}" alt="${details.name}" style="max-width:100%;max-height:240px;object-fit:contain;">
+              <button id='prevImg' style='position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.4);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:1.2rem;cursor:pointer;'>&lt;</button>
+              <button id='nextImg' style='position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.4);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:1.2rem;cursor:pointer;'>&gt;</button>
+              <div style='position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);color:#fff;padding:2px 10px;border-radius:12px;font-size:0.95rem;'>${current+1} / ${details.detailImages.length}</div>
+            </div>
+          `;
+          document.getElementById('prevImg').onclick = () => { current = (current-1+details.detailImages.length)%details.detailImages.length; renderCarousel(); };
+          document.getElementById('nextImg').onclick = () => { current = (current+1)%details.detailImages.length; renderCarousel(); };
+        }
+        renderCarousel();
+      }
+      detailsDiv.innerHTML = `
+        <h2 style="margin-top:0;">${details.name}</h2>
+        <div style="font-size:1.1rem;margin-bottom:0.7rem;"><strong>Price:</strong> ${details.price}</div>
+        <div id="price-honesty-meter" style="font-weight:bold; margin:10px 0; color:#007bff;">Checking price honesty...</div>
+        <div style="font-size:1.1rem;margin-bottom:0.7rem;"><strong>Kilometers Used:</strong> ${details.km}</div>
+        <div style="font-size:1.1rem;margin-bottom:0.7rem;"><strong>Dealer:</strong> ${details.dealer}</div>
+        <div style="font-size:1.1rem;margin-bottom:0.7rem;"><strong>Type:</strong> ${details.type}</div>
+      `;
+      document.getElementById('vehicle-popup').value = details.name;
+      // --- Price Honesty Meter using OLX data ---
+      const query = encodeURIComponent(details.name);
+      const listedPrice = parseInt(details.price.replace(/[^\d]/g, ''));
+      fetch(`http://localhost:5000/olx-prices?query=${query}`)
+        .then(r => r.json())
+        .then(data => {
+          const prices = data.prices || [];
+          if (prices.length === 0) {
+            document.getElementById('price-honesty-meter').innerText = 'No OLX data available.';
+            return;
+          }
+          const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+          let verdict = '';
+          if (listedPrice < avg * 0.9) verdict = 'Good Deal';
+          else if (listedPrice > avg * 1.1) verdict = 'Overpriced';
+          else verdict = 'Fair';
+          document.getElementById('price-honesty-meter').innerText = `${verdict} (OLX Avg: ₹${avg.toFixed(0)})`;
+        })
+        .catch(() => {
+          document.getElementById('price-honesty-meter').innerText = 'Error checking price honesty.';
+        });
+    } else {
+      detailsDiv.innerHTML = '<p>Vehicle details not found.</p>';
+    }
+    // Enquire Now button opens popup and pre-fills vehicle
+    document.getElementById('enquire-details-btn').onclick = function() {
+      document.getElementById('vehicle-popup').value = details ? details.name : '';
+      document.getElementById('enquiry-popup').style.display = 'block';
+    };
+    // Floating popup logic
+    const fab = document.getElementById('enquiry-fab');
+    const popup = document.getElementById('enquiry-popup');
+    const closePopup = document.getElementById('close-enquiry-popup');
+    const enquiryFormPopup = document.getElementById('enquiryFormPopup');
+    const enquirySuccessPopup = document.getElementById('enquirySuccessPopup');
+    fab.onclick = () => { popup.style.display = (popup.style.display === 'block') ? 'none' : 'block'; };
+    closePopup.onclick = () => { popup.style.display = 'none'; };
+    window.onclick = (e) => { if (e.target === popup) popup.style.display = 'none'; };
+    enquiryFormPopup.onsubmit = function(e) {
+      e.preventDefault();
+      fetch(enquiryFormPopup.action, {
+        method: 'POST',
+        body: new FormData(enquiryFormPopup),
+        headers: { 'Accept': 'application/json' }
+      }).then(response => {
+        if (response.ok) {
+          enquirySuccessPopup.style.display = 'block';
+          enquiryFormPopup.reset();
+          setTimeout(() => { popup.style.display = 'none'; enquirySuccessPopup.style.display = 'none'; }, 1500);
+        } else {
+          enquirySuccessPopup.style.display = 'block';
+          enquirySuccessPopup.style.color = 'red';
+          enquirySuccessPopup.textContent = 'There was an error sending your enquiry.';
+        }
+      });
+    }
+  </script>
+</body>
+</html> 

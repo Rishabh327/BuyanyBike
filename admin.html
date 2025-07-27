@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Add Listing | BuyanyBike</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="logo" style="text-decoration:none;">BuyanyBike</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="listings.html">Listings</a></li>
+      <li><a href="buyer-inquiry.html">Buyer Inquiry</a></li>
+      <li><a href="dealer-info.html">Dealer Info</a></li>
+      <li><a href="dealer-login.html">Dealer Login</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section style="max-width:600px;margin:2.5rem auto;">
+      <div style="background:#f8fafc;padding:2.5rem 2rem 2rem 2rem;border-radius:1.5rem;box-shadow:0 4px 32px rgba(0,0,0,0.10);">
+        <h2 style="text-align:center;font-size:2rem;font-weight:700;color:#007bff;margin-bottom:2rem;letter-spacing:0.5px;">Admin Dashboard</h2>
+        <div id="admin-content">
+          <form id="passwordForm" style="display:flex;flex-direction:column;gap:1.2rem;background:#fff;padding:2rem 1.5rem;border-radius:1rem;box-shadow:0 2px 16px rgba(0,0,0,0.10);align-items:center;">
+            <label for="adminPassword" style="font-size:1.1rem;font-weight:500;">Enter Admin Password:</label>
+            <input type="password" id="adminPassword" required style="padding:0.8rem 1rem;border-radius:8px;border:1.5px solid #b0b0b0;font-size:1.1rem;width:100%;max-width:320px;">
+            <button type="submit" class="btn btn-primary" style="width:100%;max-width:200px;font-size:1.1rem;">Login</button>
+            <div id="passwordError" style="color:#e74c3c;display:none;margin-top:0.5rem;text-align:center;font-weight:500;">Incorrect password. Try again.</div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <p>&copy; 2025 BuyanyBike. All rights reserved.</p>
+  </footer>
+  <script>
+    const ADMIN_PASSWORD = 'scootyadmin'; // Change this to your desired password
+    const adminContent = document.getElementById('admin-content');
+    const passwordForm = document.getElementById('passwordForm');
+    const passwordError = document.getElementById('passwordError');
+    passwordForm.onsubmit = function(e) {
+      e.preventDefault();
+      const entered = document.getElementById('adminPassword').value;
+      if (entered === ADMIN_PASSWORD) {
+        showAdminForm();
+      } else {
+        passwordError.style.display = 'block';
+      }
+    };
+    function showAdminForm() {
+      adminContent.innerHTML = `
+        <div id="admin-nav" style="display:flex;gap:1.5rem;justify-content:center;margin-bottom:2.2rem;">
+          <button id="nav-add" class="btn btn-primary" style="font-size:1.1rem;padding:0.7rem 2.2rem;border-radius:8px;font-weight:600;">Add Listing</button>
+          <button id="nav-modify" class="btn btn-secondary" style="font-size:1.1rem;padding:0.7rem 2.2rem;border-radius:8px;font-weight:600;background:#f8fafc;color:#007bff;border:1.5px solid #007bff;">Modify Listings</button>
+        </div>
+        <div id="add-section"></div>
+        <div id="modify-section" style="display:none;"></div>
+      `;
+      // Navigation logic
+      const addSection = document.getElementById('add-section');
+      const modifySection = document.getElementById('modify-section');
+      document.getElementById('nav-add').onclick = function() {
+        addSection.style.display = '';
+        modifySection.style.display = 'none';
+        this.classList.add('btn-primary');
+        this.classList.remove('btn-secondary');
+        document.getElementById('nav-modify').classList.remove('btn-primary');
+        document.getElementById('nav-modify').classList.add('btn-secondary');
+      };
+      document.getElementById('nav-modify').onclick = function() {
+        addSection.style.display = 'none';
+        modifySection.style.display = '';
+        this.classList.add('btn-primary');
+        this.classList.remove('btn-secondary');
+        document.getElementById('nav-add').classList.remove('btn-primary');
+        document.getElementById('nav-add').classList.add('btn-secondary');
+        renderModifySection();
+      };
+      // Add Listing Section
+      addSection.innerHTML = `
+        <form id="addListingForm" style="display:flex;flex-direction:column;gap:1.2rem;background:#fff;padding:2.2rem 1.5rem 1.5rem 1.5rem;border-radius:1.2rem;box-shadow:0 2px 16px rgba(0,0,0,0.10);margin-bottom:2.5rem;">
+          <label for="name">Vehicle Name</label>
+          <input type="text" id="name" required style="padding:0.8rem 1rem;border-radius:8px;border:1.5px solid #b0b0b0;font-size:1.08rem;">
+          <label for="price">Price</label>
+          <input type="text" id="price" required style="padding:0.8rem 1rem;border-radius:8px;border:1.5px solid #b0b0b0;font-size:1.08rem;">
+          <label for="km">Kilometers Used</label>
+          <input type="text" id="km" required style="padding:0.8rem 1rem;border-radius:8px;border:1.5px solid #b0b0b0;font-size:1.08rem;">
+          <label for="dealer">Dealer</label>
+          <input type="text" id="dealer" required style="padding:0.8rem 1rem;border-radius:8px;border:1.5px solid #b0b0b0;font-size:1.08rem;">
+          <label for="type">Type</label>
+          <select id="type" required style="padding:0.8rem 1rem;border-radius:8px;border:1.5px solid #b0b0b0;font-size:1.08rem;">
+            <option value="bike">Bike</option>
+            <option value="scooty">Scooty</option>
+          </select>
+          <label for="mainImage">Main Image (for listing card)</label>
+          <input type="file" id="mainImage" accept="image/*" required style="padding:0.5rem 0;">
+          <label for="detailImages">Detail Images (for carousel, multiple allowed)</label>
+          <input type="file" id="detailImages" accept="image/*" multiple required style="padding:0.5rem 0;">
+          <button type="submit" class="btn btn-primary" style="margin-top:0.7rem;font-size:1.08rem;">Add Listing</button>
+          <div id="addSuccess" style="color:#27ae60;display:none;margin-top:0.5rem;text-align:center;font-weight:500;">Listing added! Refresh listings page to see it.</div>
+        </form>
+        <div id="mainImagePreview" style="margin:0.5rem 0;"></div>
+        <div id="detailImagesPreview" style="margin:0.5rem 0;"></div>
+      `;
+      // Modify Listings Section
+      modifySection.innerHTML = `
+        <div style="background:#fff;padding:2rem 1.5rem 1.5rem 1.5rem;border-radius:1.2rem;box-shadow:0 2px 16px rgba(0,0,0,0.10);margin-bottom:2.5rem;">
+          <h3 style="margin-bottom:1.2rem;font-size:1.3rem;color:#007bff;font-weight:700;">Modify Listings</h3>
+          <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+            <input id="filterName" type="text" placeholder="Search by name..." style="flex:1;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #b0b0b0;font-size:1.05rem;">
+            <input id="filterDealer" type="text" placeholder="Dealer..." style="flex:1;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #b0b0b0;font-size:1.05rem;">
+            <select id="filterType" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #b0b0b0;font-size:1.05rem;">
+              <option value="">All Types</option>
+              <option value="bike">Bike</option>
+              <option value="scooty">Scooty</option>
+            </select>
+          </div>
+          <div id="admin-listings-section"></div>
+        </div>
+      `;
+      document.getElementById('addListingForm').onsubmit = async function(e) {
+        e.preventDefault();
+        // If not editing, require images
+        if (!this.hasAttribute('data-edit-idx')) {
+          document.getElementById('mainImage').setAttribute('required', 'required');
+          document.getElementById('detailImages').setAttribute('required', 'required');
+        }
+        // Read and resize main image as Base64
+        const mainImageFile = document.getElementById('mainImage').files[0];
+        const mainImageBase64 = mainImageFile ? await resizeAndToBase64(mainImageFile) : '';
+        // Read and resize detail images as Base64 array
+        const detailFiles = Array.from(document.getElementById('detailImages').files);
+        const detailImagesBase64 = await Promise.all(detailFiles.map(f => resizeAndToBase64(f)));
+        const newListing = {
+          name: document.getElementById('name').value,
+          price: document.getElementById('price').value,
+          km: document.getElementById('km').value,
+          dealer: document.getElementById('dealer').value,
+          type: document.getElementById('type').value,
+          mainImage: mainImageBase64,
+          detailImages: detailImagesBase64
+        };
+        // Save to localStorage
+        let adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+        const editIdx = this.getAttribute('data-edit-idx');
+        if (editIdx !== null) {
+          // Update existing listing (keep old images if new not provided)
+          const old = adminListings[editIdx];
+          newListing.mainImage = mainImageBase64 || old.mainImage;
+          newListing.detailImages = detailImagesBase64.length ? old.detailImages.concat(detailImagesBase64) : old.detailImages;
+          adminListings[editIdx] = newListing;
+          this.removeAttribute('data-edit-idx');
+          document.querySelector('#addListingForm button[type="submit"]').textContent = 'Add Listing';
+        } else {
+          adminListings.push(newListing);
+        }
+        localStorage.setItem('adminListings', JSON.stringify(adminListings));
+        document.getElementById('addSuccess').style.display = 'block';
+        this.reset();
+        renderAdminListings();
+      };
+      // Helper to convert and resize file to Base64
+      function resizeAndToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const img = new window.Image();
+            img.onload = function() {
+              const MAX_WIDTH = 800;
+              let width = img.width;
+              let height = img.height;
+              if (width > MAX_WIDTH) {
+                height = Math.round(height * (MAX_WIDTH / width));
+                width = MAX_WIDTH;
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              // Compress to JPEG quality 0.7
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+              resolve(dataUrl);
+            };
+            img.onerror = reject;
+            img.src = event.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+      renderAdminListings();
+      function renderAdminListings() {
+        const section = document.getElementById('admin-listings-section');
+        let adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+        if (adminListings.length === 0) {
+          section.innerHTML = '<p style="text-align:center;color:#888;">No admin-added listings yet.</p>';
+          return;
+        }
+        section.innerHTML = '<h3 style="margin-bottom:1rem;">Your Listings</h3>' +
+          adminListings.map((l, i) => `
+            <div style="display:flex;align-items:center;gap:1.2rem;background:#fff;padding:1.1rem 1.1rem;border-radius:1rem;margin-bottom:1.2rem;box-shadow:0 2px 10px rgba(0,0,0,0.07);transition:box-shadow 0.2s;">
+              ${l.mainImage ? `<img src="${l.mainImage}" alt="${l.name}" style="width:60px;height:40px;object-fit:cover;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);">` : ''}
+              <div style="flex:1;">
+                <div style="font-weight:700;font-size:1.08rem;letter-spacing:0.2px;">${l.name}</div>
+                <div style="font-size:0.98rem;color:#555;">${l.price} | ${l.km} | ${l.dealer} | <span style='text-transform:capitalize;'>${l.type}</span></div>
+              </div>
+              <button data-edit="${i}" style="background:#f1c40f;color:#222;border:none;padding:0.5rem 1.1rem;border-radius:6px;cursor:pointer;margin-right:0.5rem;font-weight:600;transition:background 0.2s;">Edit</button>
+              <button data-del="${i}" style="background:#e74c3c;color:#fff;border:none;padding:0.5rem 1.1rem;border-radius:6px;cursor:pointer;font-weight:600;transition:background 0.2s;">Delete</button>
+            </div>
+          `).join('');
+        Array.from(section.querySelectorAll('button[data-del]')).forEach(btn => {
+          btn.onclick = function() {
+            const idx = parseInt(this.getAttribute('data-del'));
+            let adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+            adminListings.splice(idx, 1);
+            localStorage.setItem('adminListings', JSON.stringify(adminListings));
+            renderAdminListings();
+          };
+        });
+        Array.from(section.querySelectorAll('button[data-edit]')).forEach(btn => {
+          btn.onclick = function() {
+            const idx = parseInt(this.getAttribute('data-edit'));
+            let adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+            const l = adminListings[idx];
+            document.getElementById('name').value = l.name;
+            document.getElementById('price').value = l.price;
+            document.getElementById('km').value = l.km;
+            document.getElementById('dealer').value = l.dealer;
+            document.getElementById('type').value = l.type;
+            // Show current images for editing
+            showImagePreviews(l, idx);
+            document.getElementById('mainImage').value = '';
+            document.getElementById('detailImages').value = '';
+            document.getElementById('mainImage').removeAttribute('required');
+            document.getElementById('detailImages').removeAttribute('required');
+            document.getElementById('addListingForm').scrollIntoView({behavior:'smooth'});
+            document.getElementById('addListingForm').setAttribute('data-edit-idx', idx);
+            document.querySelector('#addListingForm button[type="submit"]').textContent = 'Update Listing';
+          };
+        });
+      }
+      // Add image preview containers to the form
+      if (!document.getElementById('mainImagePreview')) {
+        const mainImgPrev = document.createElement('div');
+        mainImgPrev.id = 'mainImagePreview';
+        mainImgPrev.style.margin = '0.5rem 0';
+        document.getElementById('mainImage').insertAdjacentElement('afterend', mainImgPrev);
+      }
+      if (!document.getElementById('detailImagesPreview')) {
+        const detailImgsPrev = document.createElement('div');
+        detailImgsPrev.id = 'detailImagesPreview';
+        detailImgsPrev.style.margin = '0.5rem 0';
+        document.getElementById('detailImages').insertAdjacentElement('afterend', detailImgsPrev);
+      }
+      // Show image previews and allow removal
+      function showImagePreviews(listing, idx) {
+        // Main image preview
+        const mainPrev = document.getElementById('mainImagePreview');
+        mainPrev.innerHTML = '';
+        if (listing.mainImage) {
+          mainPrev.innerHTML = `<div style='display:flex;align-items:center;gap:0.5rem;'><img src="${listing.mainImage}" style="width:80px;height:50px;object-fit:cover;border-radius:6px;"> <button id='removeMainImg' style='background:#e74c3c;color:#fff;border:none;padding:0.2rem 0.7rem;border-radius:6px;cursor:pointer;'>Remove</button></div>`;
+          document.getElementById('removeMainImg').onclick = function() {
+            let adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+            adminListings[idx].mainImage = '';
+            localStorage.setItem('adminListings', JSON.stringify(adminListings));
+            showImagePreviews(adminListings[idx], idx);
+          };
+        }
+        // Detail images preview
+        const detailPrev = document.getElementById('detailImagesPreview');
+        detailPrev.innerHTML = '';
+        if (listing.detailImages && listing.detailImages.length) {
+          detailPrev.innerHTML = listing.detailImages.map((img, i) =>
+            `<span style='display:inline-block;position:relative;margin-right:8px;'>
+              <img src="${img}" style="width:60px;height:40px;object-fit:cover;border-radius:6px;">
+              <button data-rm-detail="${i}" style='position:absolute;top:0;right:0;background:#e74c3c;color:#fff;border:none;padding:0 6px;border-radius:0 6px 0 6px;cursor:pointer;font-size:0.9rem;'>×</button>
+            </span>`
+          ).join('');
+          Array.from(detailPrev.querySelectorAll('button[data-rm-detail]')).forEach(btn => {
+            btn.onclick = function() {
+              const rmIdx = parseInt(this.getAttribute('data-rm-detail'));
+              let adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+              adminListings[idx].detailImages.splice(rmIdx, 1);
+              localStorage.setItem('adminListings', JSON.stringify(adminListings));
+              showImagePreviews(adminListings[idx], idx);
+            };
+          });
+        }
+      }
+      // Filter logic for modify section
+      function renderModifySection() {
+        const section = document.getElementById('admin-listings-section');
+        let adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+        const nameVal = document.getElementById('filterName').value.toLowerCase();
+        const dealerVal = document.getElementById('filterDealer').value.toLowerCase();
+        const typeVal = document.getElementById('filterType').value;
+        let filtered = adminListings.filter(l =>
+          (!nameVal || l.name.toLowerCase().includes(nameVal)) &&
+          (!dealerVal || l.dealer.toLowerCase().includes(dealerVal)) &&
+          (!typeVal || l.type === typeVal)
+        );
+        if (filtered.length === 0) {
+          section.innerHTML = '<p style="text-align:center;color:#888;">No listings found.</p>';
+          return;
+        }
+        section.innerHTML = filtered.map((l, i) => `
+          <div style="display:flex;align-items:center;gap:1.2rem;background:#fff;padding:1.1rem 1.1rem;border-radius:1rem;margin-bottom:1.2rem;box-shadow:0 2px 10px rgba(0,0,0,0.07);transition:box-shadow 0.2s;">
+            ${l.mainImage ? `<img src="${l.mainImage}" alt="${l.name}" style="width:60px;height:40px;object-fit:cover;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);">` : ''}
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:1.08rem;letter-spacing:0.2px;">${l.name}</div>
+              <div style="font-size:0.98rem;color:#555;">${l.price} | ${l.km} | ${l.dealer} | <span style='text-transform:capitalize;'>${l.type}</span></div>
+            </div>
+            <button data-edit="${i}" style="background:#f1c40f;color:#222;border:none;padding:0.5rem 1.1rem;border-radius:6px;cursor:pointer;margin-right:0.5rem;font-weight:600;transition:background 0.2s;">Edit</button>
+            <button data-del="${i}" style="background:#e74c3c;color:#fff;border:none;padding:0.5rem 1.1rem;border-radius:6px;cursor:pointer;font-weight:600;transition:background 0.2s;">Delete</button>
+          </div>
+        `).join('');
+        Array.from(section.querySelectorAll('button[data-del]')).forEach(btn => {
+          btn.onclick = function() {
+            const idx = parseInt(this.getAttribute('data-del'));
+            let adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+            adminListings.splice(idx, 1);
+            localStorage.setItem('adminListings', JSON.stringify(adminListings));
+            renderModifySection();
+          };
+        });
+        Array.from(section.querySelectorAll('button[data-edit]')).forEach(btn => {
+          btn.onclick = function() {
+            const idx = parseInt(this.getAttribute('data-edit'));
+            let adminListings = JSON.parse(localStorage.getItem('adminListings') || '[]');
+            const l = adminListings[idx];
+            document.getElementById('nav-add').click();
+            document.getElementById('name').value = l.name;
+            document.getElementById('price').value = l.price;
+            document.getElementById('km').value = l.km;
+            document.getElementById('dealer').value = l.dealer;
+            document.getElementById('type').value = l.type;
+            showImagePreviews(l, idx);
+            document.getElementById('mainImage').value = '';
+            document.getElementById('detailImages').value = '';
+            document.getElementById('mainImage').removeAttribute('required');
+            document.getElementById('detailImages').removeAttribute('required');
+            document.getElementById('addListingForm').scrollIntoView({behavior:'smooth'});
+            document.getElementById('addListingForm').setAttribute('data-edit-idx', idx);
+            document.querySelector('#addListingForm button[type="submit"]').textContent = 'Update Listing';
+          };
+        });
+      }
+      // Filter events
+      document.getElementById('filterName').oninput = renderModifySection;
+      document.getElementById('filterDealer').oninput = renderModifySection;
+      document.getElementById('filterType').onchange = renderModifySection;
+      // Initial view: show dashboard options
+      addSection.style.display = '';
+      modifySection.style.display = 'none';
+    }
+  </script>
+</body>
+</html> 
