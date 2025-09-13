@@ -87,30 +87,7 @@
         <div style="font-size:1.1rem;margin-bottom:0.7rem;"><strong>Type:</strong> ${details.type}</div>
       `;
       document.getElementById('vehicle-popup').value = details.name;
-      // --- Price Honesty Meter using OLX data ---
-      const query = encodeURIComponent(details.name);
-      const listedPrice = parseInt(details.price.replace(/[^\d]/g, ''));
-      fetch(`http://localhost:5000/olx-prices?query=${query}`)
-        .then(r => r.json())
-        .then(data => {
-          const prices = data.prices || [];
-          if (prices.length === 0) {
-            document.getElementById('price-honesty-meter').innerText = 'No OLX data available.';
-            return;
-          }
-          const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
-          let verdict = '';
-          if (listedPrice < avg * 0.9) verdict = 'Good Deal';
-          else if (listedPrice > avg * 1.1) verdict = 'Overpriced';
-          else verdict = 'Fair';
-          document.getElementById('price-honesty-meter').innerText = `${verdict} (OLX Avg: ₹${avg.toFixed(0)})`;
-        })
-        .catch(() => {
-          document.getElementById('price-honesty-meter').innerText = 'Error checking price honesty.';
-        });
-    } else {
-      detailsDiv.innerHTML = '<p>Vehicle details not found.</p>';
-    }
+      
     // Enquire Now button opens popup and pre-fills vehicle
     document.getElementById('enquire-details-btn').onclick = function() {
       document.getElementById('vehicle-popup').value = details ? details.name : '';
@@ -153,3 +130,4 @@
 </script>
 </body>
 </html> 
+
